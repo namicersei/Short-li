@@ -1,0 +1,23 @@
+{
+  "name": "express-test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^3.0.0",
+    "body-parser": "^1.18.3",
+    "express": "^4.16.3",
+    "jsonwebtoken": "^8.3.0",
+    "jwt-decode": "^2.2.0",
+    "lorem-ipsum": "^1.0.5",
+    "moment": "^2.22.2",
+    "mongoose": "^5.2.4",
+    "short-id": "0.1.0-1",
+    "valid-url": "^1.0.9"
+  }
+}
