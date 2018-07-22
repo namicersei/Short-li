@@ -150,6 +150,18 @@ app.get("/getList", (req, res) => {
     .catch(err => res.status(401).send(err.message))
 })
 
+// For redirecting to long urls **********************************
+
+app.get("/redirect", (req, res) => {
+  const requestedUrl = req.query.url
+  console.log(requestedUrl)
+  Url
+    .findOne({ shortenedUrl: requestedUrl }, { _id: 0, longUrl: 1 })
+    .exec()
+    .then((data) => {
+      res.redirect(data.longUrl)
+    })
+})
 
 // *************************************Port settings*******************************************************//
 
