@@ -12,14 +12,13 @@ const bcrypt = require("bcrypt")
 
 // *******************Prerequisites for shortening url******************************************************/
 
-const shortid = require("short-id")
-const validUrl = require("valid-url")
+const cuid = require("cuid")
+const isUrl = require("is-url")
 
 //* ********************************Databases****************************************/
 
 const User = require("./user-database.js")
 const Url = require("./url-database.js")
-const UrlCount = require("./url-count-database.js")
 mongoose.connect("mongodb://localhost:27017/shortli", { useNewUrlParser: true })
 
 
@@ -45,7 +44,6 @@ const hashWare = function (req, res, next) {
     } else {
       throw new Error("Could not register. Try again later")
     }
-
   })
 }
 
@@ -53,10 +51,10 @@ const hashWare = function (req, res, next) {
 
 app.post("/register", hashWare, (req, res) => {
   const user = new User(req.body)
-  // user
-  //   .save()
-  //   .then(data => res.status(200).send(`Congrats! Welcome ${data.username}`))
-  //   .catch(err => res.status(500).send("Sorry! Could not register ! Try again later!!"))
+  user
+    .save()
+    .then(data => res.status(200).send(`Congrats! Welcome ${data.username}`))
+    .catch(err => res.status(500).send("Sorry! Could not register ! Try again later!!"))
 })
 
 // // login
@@ -88,7 +86,6 @@ app.post("/login", (req, res) => {
     })
     .catch(err => console.log(err))
     .catch(err => res.status(403).send(err.message))
-
 })
 
 // **********************************Routes**********************************************************************/
@@ -98,8 +95,8 @@ app.post("/login", (req, res) => {
 const verifyWare = function (req, res, next) {
   const token = req.headers.authorization
   const decoded = jwt.verify(token, secretKey)
-  console.log(decoded)
   if (decoded) {
+    res.locals.user = decoded.email
     next()
   } else {
     res.status(400).send("Not a valid user!")
@@ -108,41 +105,51 @@ const verifyWare = function (req, res, next) {
 
 app.use(verifyWare)
 
+// Route for getting tiny urls*************************************
+
 app.post("/getShort", (req, res) => {
-  var count
-  // if (validUrl.isUri()) {
-  // // Find if the url is already prsent or not
-  UrlCount.findOne({ sort: { count: -1 } }, {})
+  const { originalUrl } = req.body
+
+  if (isUrl(originalUrl)) {
+  // Find if the url is already prsent or not
+
+  // Else make a new shortUrl
+    let shortUrl = "http://shortli/"
+    const uniqueId = cuid.slug()
+    shortUrl += uniqueId
+    const url = new Url({
+      nameOfUser: res.locals.user,
+      longUrl: originalUrl,
+      shortenedUrl: shortUrl,
+      createdAt: new Date()
+    })
+    url
+      .save()
+      .then((data) => {
+        res.json(shortUrl)
+      })
+      .catch(err => res.status(401).send("Sorry! Could not process your request! Try again later."))
+  } else {
+    console.log("Please enter new url!")
+  }
+})
+
+// Route for getting the users list of tiny urls ***********************
+
+app.get("/getList", (req, res) => {
+  Url
+    .find({ nameOfUser: res.locals.user }, {
+      _id: 0,
+      longUrl: 1,
+      shortenedUrl: 1
+    })
     .exec()
     .then((data) => {
-      count = data
+      res.send(data)
     })
-    .catch(err => res.send(err))
-  const map = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-  let shortUrl = ""
-  let n = count
-  while (n) {
-    console.log(n)
-    const c = map[n % 62]
-    console.log(c)
-    shortUrl += c
-    n = Math.floor(n / 62);
-    console.log(n)
-  } 
-  console.log(count)
-  console.log(shortUrl)
-  res.send("hi")
-  // console.log(shortUrl)
-  //   // urlCount
-  //   //   .save()
-  //   //   .then(data => console.log("hi"))
-  //   //   .catch(err => res.send(err.message))
-
-  // } else {
-  //   console.log("Please enter new url!")
-  // }
-  // console.log(shortid.generate())
+    .catch(err => res.status(401).send(err.message))
 })
+
 
 // *************************************Port settings*******************************************************//
 

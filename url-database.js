@@ -1,12 +1,10 @@
 const mongoose = require("mongoose")
 
 const urlSchema = mongoose.Schema({
-  unique_id: Number,
   nameOfUser: String,
-  originalUrl: String,
+  longUrl: String,
   shortenedUrl: String,
-  createdAt: Date,
-  hash: String
+  createdAt: Date
 })
 
 const Url = mongoose.model("Url", urlSchema)
