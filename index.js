@@ -64,9 +64,9 @@ app.post("/login", (req, res) => {
   User
     .findOne({ username })
     .exec()
-    .then((data) => {
-      if (!data) throw new Error("No such user")
-      const { password } = data
+    .then((user) => {
+      if (!user) throw new Error("No such user")
+      const { password } = user
       return bcrypt.compare(req.body.password, password)
     })
     .then((result) => {
@@ -131,7 +131,7 @@ app.post("/getShort", (req, res) => {
     const url = new Url({
       nameOfUser: res.locals.user,
       longUrl: originalUrl,
-      shortenedUrl: uniqueId,
+      unique_id: uniqueId,
       createdAt: new Date()
     })
     url
@@ -147,12 +147,13 @@ app.post("/getShort", (req, res) => {
 
 // Route for getting the users list of tiny urls ***********************
 
-app.get("/getList", (req, res) => {
+app.get("/redirect/getList", (req, res) => {
+  console.log(res.locals.user)
   Url
     .find({ nameOfUser: res.locals.user }, {
       _id: 0,
       longUrl: 1,
-      shortenedUrl: 1
+      unique_id: 1
     })
     .exec()
     .then((data) => {

@@ -3,7 +3,7 @@ const mongoose = require("mongoose")
 const urlSchema = mongoose.Schema({
   nameOfUser: String,
   longUrl: String,
-  shortenedUrl: String,
+  unique_id: String,
   createdAt: Date
 })
 
