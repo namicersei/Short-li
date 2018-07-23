@@ -92,8 +92,8 @@ app.post("/login", (req, res) => {
 
 // For redirecting to long urls **********************************
 
-app.get("/redirect", (req, res) => {
-  const requestedUrl = req.query.url
+app.get("/:id", (req, res) => {
+  const requestedUrl = req.params.id
   console.log(requestedUrl)
   Url
     .findOne({ shortenedUrl: requestedUrl }, { _id: 0, longUrl: 1 })
