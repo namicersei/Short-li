@@ -90,6 +90,18 @@ app.post("/login", (req, res) => {
 
 // **********************************Routes**********************************************************************/
 
+// For redirecting to long urls **********************************
+
+app.get("/redirect", (req, res) => {
+  const requestedUrl = req.query.url
+  console.log(requestedUrl)
+  Url
+    .findOne({ shortenedUrl: requestedUrl }, { _id: 0, longUrl: 1 })
+    .exec()
+    .then(data => res.redirect(data.longUrl))
+})
+
+
 // Middle ware for checking the user//
 
 const verifyWare = function (req, res, next) {
@@ -104,7 +116,6 @@ const verifyWare = function (req, res, next) {
 }
 
 app.use(verifyWare)
-
 // Route for getting tiny urls*************************************
 
 app.post("/getShort", (req, res) => {
@@ -150,18 +161,6 @@ app.get("/getList", (req, res) => {
     .catch(err => res.status(401).send(err.message))
 })
 
-// For redirecting to long urls **********************************
-
-app.get("/redirect", (req, res) => {
-  const requestedUrl = req.query.url
-  console.log(requestedUrl)
-  Url
-    .findOne({ shortenedUrl: requestedUrl }, { _id: 0, longUrl: 1 })
-    .exec()
-    .then((data) => {
-      res.redirect(data.longUrl)
-    })
-})
 
 // *************************************Port settings*******************************************************//
 
