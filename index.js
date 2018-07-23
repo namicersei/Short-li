@@ -114,13 +114,13 @@ app.post("/getShort", (req, res) => {
   // Find if the url is already prsent or not
 
   // Else make a new shortUrl
-    let shortUrl = "http://shortli/"
+    let shortUrl = "http://localhost:3000/"
     const uniqueId = cuid.slug()
     shortUrl += uniqueId
     const url = new Url({
       nameOfUser: res.locals.user,
       longUrl: originalUrl,
-      shortenedUrl: shortUrl,
+      shortenedUrl: uniqueId,
       createdAt: new Date()
     })
     url
